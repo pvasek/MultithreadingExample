@@ -1,33 +1,43 @@
-﻿using MultithreadingExample.Entities;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using MultithreadingExample.Entities;
 
 namespace MultithreadingExample.Services
 {
     public class Processor: IProcessor
     {
-        public Processor(string id, Action<Message> forwardMessage)
+        public Processor(string id, IMessageDispatcher messageDispatcher)
         {
-            Id = id;
-            _forwardMessage = forwardMessage;
+            _id = id;
+            _messageDispatcher = messageDispatcher;
         }
 
         private readonly ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
-        private readonly Action<Message> _forwardMessage;
         private Thread _thread;
+        private readonly AutoResetEvent _continueEvent = new AutoResetEvent(false);
+        private readonly IMessageDispatcher _messageDispatcher;
+        private bool _stopped;
+        private readonly string _id;
 
-        public string Id { get; set; }
+        private void Done(Message message)
+        {
+            if (OnDone != null)
+            {
+                OnDone(this, message);
+            }
+        }
 
-        public int QueueCount { get { return _queue.Count; } }
+        public event EventHandler<Message> OnDone; 
 
         public void Process(Message message)
         {
             _queue.Enqueue(message);
+            _continueEvent.Set();                        
         }
 
         public void Start()
-        {
+        {      
             _thread = new Thread(() =>
             {
                 while (true)
@@ -35,20 +45,33 @@ namespace MultithreadingExample.Services
                     Message message;
                     if (_queue.TryDequeue(out message))
                     {
-                        if (Id == message.RecepientId)
+                        if (_id == message.RecepientId)
                         {
-                            // process
-                            Console.WriteLine("processed " + message.Id);
+                            Done(message);
                         }
                         else
                         {
-                            _forwardMessage(message);
+                            _messageDispatcher.Dispatch(message);
                         }
                     }
-                    Thread.Sleep(20);
+                    if (_queue.Count == 0)
+                    {
+                        _continueEvent.WaitOne();
+                    }
+                    if (_stopped)
+                    {
+                        break;
+                    }
                 }
             });
             _thread.Start();
+        }
+
+        public void Stop()
+        {
+            _stopped = true;
+            _continueEvent.Set();
+            _thread = null;
         }
     }
 }

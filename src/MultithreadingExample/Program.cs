@@ -11,9 +11,9 @@ namespace MultithreadingExample
         {
             var numberOfProcessors = Int32.Parse(args[0]);
             var numberOfMessages = Int32.Parse(args[1]);
-            var random = new Random();
+            var random = new Random(Environment.TickCount);
 
-            var scheduler = new Scheduler(numberOfProcessors, new ProcessorFactory());
+            var scheduler = new MessageDispatcher(numberOfProcessors, new ProcessorFactory());
             
             var messages = Enumerable
                 .Range(0, numberOfProcessors * numberOfMessages)
@@ -24,8 +24,24 @@ namespace MultithreadingExample
                 })
                 .ToList();
 
-            scheduler.Start(messages);
+            scheduler.DispatchAll(messages);
+            scheduler.WaitToFinish();
 
+            var averageForwarding = messages.Average(i => i.DispatchingCount);
+            
+            var histogram = messages
+                .GroupBy(i => i.DispatchingCount)
+                .OrderBy(i => i.Key)
+                .Select(i => new {Number = i.Key, Count = i.Count()})
+                .Take(20)
+                .ToList();
+
+            Console.WriteLine("{0:0.000}", averageForwarding);
+            foreach (var histogramItem in histogram)
+            {
+                Console.WriteLine("{0}\t{1}", histogramItem.Number, histogramItem.Count);
+            }
+            
             Console.ReadLine();
         }
     }    

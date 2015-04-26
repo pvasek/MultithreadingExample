@@ -45,10 +45,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IProcessor.cs" />
+    <Compile Include="Services\IMessageDispatcher.cs" />
     <Compile Include="Services\ProcessorFactory.cs" />
     <Compile Include="Services\IProcessorFactory.cs" />
     <Compile Include="Services\Processor.cs" />
-    <Compile Include="Services\Scheduler.cs" />
+    <Compile Include="Services\MessageDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

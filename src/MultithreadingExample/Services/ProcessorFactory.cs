@@ -1,13 +1,10 @@
-﻿using System;
-using MultithreadingExample.Entities;
-
-namespace MultithreadingExample.Services
+﻿namespace MultithreadingExample.Services
 {
     public class ProcessorFactory: IProcessorFactory
     {
-        public IProcessor Create(string id, Action<Message> forwardMessage)
+        public IProcessor Create(string id, IMessageDispatcher messageDispatcher)
         {
-            return new Processor(id, forwardMessage);
+            return new Processor(id, messageDispatcher);
         }
     }
 }
