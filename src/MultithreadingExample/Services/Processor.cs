@@ -14,11 +14,12 @@ namespace MultithreadingExample.Services
         }
 
         private readonly ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
-        private Thread _thread;
         private readonly AutoResetEvent _continueEvent = new AutoResetEvent(false);
-        private readonly IMessageDispatcher _messageDispatcher;
-        private bool _stopped;
         private readonly string _id;
+        private readonly IMessageDispatcher _messageDispatcher;
+
+        private bool _stopped;
+        private Thread _thread;
 
         private void Done(Message message)
         {

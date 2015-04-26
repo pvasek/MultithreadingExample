@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Moq;
 using MultithreadingExample.Entities;
 using MultithreadingExample.Services;
@@ -10,10 +9,10 @@ using NUnit.Framework;
 namespace MultithreadingExample.Tests
 {
     [TestFixture]
-    public class SchedulerTest
+    public class MessageDispatcherTest
     {
         [Test]
-        public void DispatchAllTest()
+        public void ShoudDispatchAllMessages()
         {
             var processorFactory = new Mock<IProcessorFactory>();
             var processors = new List<TestProcessor>();
@@ -58,7 +57,7 @@ namespace MultithreadingExample.Tests
         }
 
         [Test]
-        public void DispatchTest()
+        public void ShouldDispatchSingleMessage()
         {
             var processorFactory = new Mock<IProcessorFactory>();
             var processor = new TestProcessor();

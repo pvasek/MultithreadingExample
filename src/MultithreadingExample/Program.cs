@@ -33,7 +33,6 @@ namespace MultithreadingExample
                 .GroupBy(i => i.DispatchingCount)
                 .OrderBy(i => i.Key)
                 .Select(i => new {Number = i.Key, Count = i.Count()})
-                .Take(20)
                 .ToList();
 
             Console.WriteLine("{0:0.000}", averageForwarding);
